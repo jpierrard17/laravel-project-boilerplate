@@ -60,6 +60,16 @@ sed -i '' "s/^FORWARD_MAILPIT_DASHBOARD_PORT=.*/FORWARD_MAILPIT_DASHBOARD_PORT=$
 echo "Ports updated in .env"
 ```
 
+# Project Setup
+
+This is a **Generator Repository**. It does not contain the application code by default. You must hydrate the project using the initialization script.
+
+## 1. Initialize Project
+This command will fetch the **latest** version of Laravel and configure the Modular Monolith architecture.
+
+```bash
+./.context/scripts/init.sh
+
 ### Usage
 
 1.  **Make executable**: `chmod +x .context/scripts/setup-ports.sh`
