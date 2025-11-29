@@ -6,11 +6,12 @@ set -e
 echo "🚀 Starting Dynamic Boilerplate Initialization..."
 
 # 1. Install Latest Laravel
-# CHANGED: Check for composer.json instead of just the directory
 if [ -f "src/composer.json" ]; then
     echo "⚠️  Laravel is already installed in 'src'. Skipping download."
 else
     echo "📦 Downloading latest Laravel into 'src'..."
+    # No need to rm -rf src; Composer will create it automatically.
+    
     docker run --rm \
         -u "$(id -u):$(id -g)" \
         -v $(pwd):/var/www/html \
@@ -25,10 +26,14 @@ mkdir -p src/app/Modules
 
 # 3. Patch Bootstrap for Module Routing
 echo "💉 Injecting Module Loader into bootstrap/app.php..."
-cp .context/stubs/bootstrap.php.stub src/bootstrap/app.php
+if [ -f "src/bootstrap/app.php" ]; then
+    cp .context/stubs/bootstrap.php.stub src/bootstrap/app.php
+else 
+    echo "❌ Error: src/bootstrap/app.php not found. Laravel install may have failed."
+    exit 1
+fi
 
 # 4. Install Tech Stack (Jetstream + Inertia)
-# REMOVED: --teams flag
 echo "🎨 Installing Jetstream & Inertia (Vue)..."
 cd src
 
