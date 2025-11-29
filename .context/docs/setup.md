@@ -1,95 +1,76 @@
-# Docker Setup & Port Management
+# Project Setup & Environment
 
-This project uses **Laravel Sail** for a Dockerized development environment. To run multiple projects simultaneously without port conflicts, we use dynamic port assignment in the `.env` file.
+This is a **Generator Repository**. The actual application code is not checked into git by default; it resides in the `src/` directory which you must hydrate.
 
-## Dynamic Port Assignment
-
-Instead of hardcoding ports, use the following script to find available ports and update your `.env` file automatically before starting Sail.
-
-### Setup Script (`.agent/setup-ports.sh`)
-
-The project includes a `setup-ports.sh` script in the `.agent` directory. This script automatically finds available ports and updates your `.env` file.
-
-**Script Logic:**
+## 1. Installation (First Time)
+To download the latest Laravel, install Jetstream/Inertia, and apply the Modular Monolith patches, run:
 
 ```bash
-#!/bin/bash
-
-# Function to find a free port starting from a base port
-find_free_port() {
-    local port=$1
-    while lsof -i:$port >/dev/null; do
-        ((port++))
-    done
-    echo $port
-}
-
-# Base ports
-BASE_APP_PORT=8000
-BASE_VITE_PORT=5173
-BASE_DB_PORT=3306
-BASE_REDIS_PORT=6379
-BASE_MAILPIT_PORT=1025
-BASE_MAILPIT_DASH_PORT=8025
-
-# Find free ports
-APP_PORT=$(find_free_port $BASE_APP_PORT)
-VITE_PORT=$(find_free_port $BASE_VITE_PORT)
-FORWARD_DB_PORT=$(find_free_port $BASE_DB_PORT)
-FORWARD_REDIS_PORT=$(find_free_port $BASE_REDIS_PORT)
-FORWARD_MAILPIT_PORT=$(find_free_port $BASE_MAILPIT_PORT)
-FORWARD_MAILPIT_DASHBOARD_PORT=$(find_free_port $BASE_MAILPIT_DASH_PORT)
-
-echo "Configuring ports..."
-echo "APP_PORT: $APP_PORT"
-echo "VITE_PORT: $VITE_PORT"
-echo "FORWARD_DB_PORT: $FORWARD_DB_PORT"
-echo "FORWARD_REDIS_PORT: $FORWARD_REDIS_PORT"
-echo "FORWARD_MAILPIT_PORT: $FORWARD_MAILPIT_PORT"
-echo "FORWARD_MAILPIT_DASHBOARD_PORT: $FORWARD_MAILPIT_DASHBOARD_PORT"
-
-# Update .env file
-# Ensure these keys exist in your .env or append them
-sed -i '' "s/^APP_PORT=.*/APP_PORT=$APP_PORT/" .env || echo "APP_PORT=$APP_PORT" >> .env
-sed -i '' "s/^VITE_PORT=.*/VITE_PORT=$VITE_PORT/" .env || echo "VITE_PORT=$VITE_PORT" >> .env
-sed -i '' "s/^FORWARD_DB_PORT=.*/FORWARD_DB_PORT=$FORWARD_DB_PORT/" .env || echo "FORWARD_DB_PORT=$FORWARD_DB_PORT" >> .env
-sed -i '' "s/^FORWARD_REDIS_PORT=.*/FORWARD_REDIS_PORT=$FORWARD_REDIS_PORT/" .env || echo "FORWARD_REDIS_PORT=$FORWARD_REDIS_PORT" >> .env
-sed -i '' "s/^FORWARD_MAILPIT_PORT=.*/FORWARD_MAILPIT_PORT=$FORWARD_MAILPIT_PORT/" .env || echo "FORWARD_MAILPIT_PORT=$FORWARD_MAILPIT_PORT" >> .env
-sed -i '' "s/^FORWARD_MAILPIT_DASHBOARD_PORT=.*/FORWARD_MAILPIT_DASHBOARD_PORT=$FORWARD_MAILPIT_DASHBOARD_PORT/" .env || echo "FORWARD_MAILPIT_DASHBOARD_PORT=$FORWARD_MAILPIT_DASHBOARD_PORT" >> .env
-
-echo "Ports updated in .env"
+# Run from repository root
+./.context/scripts/init.sh
 ```
 
-# Project Setup
+* **What this does:**
+    * Downloads Laravel 11 into `src/`.
+    * Configures `bootstrap/app.php` for Module routing.
+    * Installs Vue 3, Tailwind, and Inertia.js.
 
-This is a **Generator Repository**. It does not contain the application code by default. You must hydrate the project using the initialization script.
+---
 
-## 1. Initialize Project
-This command will fetch the **latest** version of Laravel and configure the Modular Monolith architecture.
+## 2. Docker Environment (Laravel Sail)
+This project uses **Laravel Sail** (Docker Compose).
+
+### Starting the App
+Once initialized, the application lives in `src`.
 
 ```bash
-./.context/scripts/init.sh
+cd src
+./vendor/bin/sail up -d
+```
 
-### Usage
+### Stopping the App
+```bash
+./vendor/bin/sail down
+```
 
-1.  **Make executable**: `chmod +x .context/scripts/setup-ports.sh`
-2.  **Run before starting Sail** (from project root):
-    ```bash
-    ./.context/scripts/setup-ports.sh
-    cd src && ./vendor/bin/sail up -d
-    ```
+### Common Commands
+Always run these from inside the `src/` directory:
 
-## Standard Sail Commands
+* **Artisan:** `./vendor/bin/sail artisan migrate`
+* **Composer:** `./vendor/bin/sail composer require ...`
+* **NPM:** `./vendor/bin/sail npm run build`
+* **Shell:** `./vendor/bin/sail shell`
 
-- **Start**: `./vendor/bin/sail up -d`
-- **Stop**: `./vendor/bin/sail down`
-- **Restart**: `./vendor/bin/sail restart`
-- **Shell**: `./vendor/bin/sail shell`
-- **Artisan**: `./vendor/bin/sail artisan ...`
-- **Composer**: `./vendor/bin/sail composer ...`
-- **NPM**: `./vendor/bin/sail npm ...`
+---
 
-## Troubleshooting
+## 3. Port Management
+To run this project alongside other Laravel apps without port conflicts (e.g., "Address already in use" errors), use the included port manager.
 
-- **Port Conflicts**: If Sail fails to start due to "address already in use", run `./setup-ports.sh` again to find new free ports.
-- **Database Connection**: Ensure your GUI client (TablePlus, Sequel Ace) uses the `FORWARD_DB_PORT` assigned in `.env`.
+**Run this from the project root:**
+
+```bash
+./.context/scripts/setup-ports.sh
+```
+
+**What this does:**
+1.  Scans for available ports on your host machine.
+2.  Updates `src/.env` automatically:
+    * `APP_PORT` (Default: 8000 -> 8001...)
+    * `VITE_PORT` (Default: 5173 -> 5174...)
+    * `FORWARD_DB_PORT` (Default: 3306 -> 3307...)
+
+> **Note:** If you change ports, you must restart Sail:
+> `cd src && ./vendor/bin/sail down && ./vendor/bin/sail up -d`
+
+---
+
+## 4. Troubleshooting
+
+### Database Connection
+When connecting via a GUI (TablePlus/Sequel Ace):
+* **Host:** `127.0.0.1` (localhost)
+* **Port:** Check `FORWARD_DB_PORT` in `src/.env`.
+* **User/Pass:** `sail` / `password`
+
+### "Missing src directory"
+If the AI complains that `src` is missing, ensure you have run the initialization script in Step 1.

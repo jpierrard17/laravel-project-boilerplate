@@ -4,6 +4,16 @@
 
 ---
 
+## SCENARIO 0: First Time Setup
+**Trigger:** User asks to "start", "setup", or "init" the project, or the `src` directory is empty/missing.
+
+1.  **Check:** Does `src/composer.json` exist?
+2.  **Action:** If not, run `./.context/scripts/init.sh`.
+3.  **Wait:** Wait for the script to complete installation (Composer/NPM).
+4.  **Verify:** Ensure `src/app/Modules` exists.
+
+---
+
 ## SCENARIO 1: New Feature / Domain Logic
 **Trigger:** User asks to "build", "create", or "add" a new capability (e.g., "Add a Gym Tracker").
 
@@ -14,17 +24,17 @@
 2.  **Scaffold:**
     * **If New Module:**
         * Run the helper script: `./.context/scripts/make-module.sh {ModuleName}`.
-        * *Action:* Register the new Module's routes or ServiceProvider in `bootstrap/providers.php` (or `app.php`) if required.
+        * *Note:* Routes are automatically discovered by `bootstrap/app.php`; no manual registration is needed.
     * **If Existing Module:**
-        * Manually create the Service/Controller in `app/Modules/{Module}/...`.
+        * Manually create the Service/Controller in `src/app/Modules/{Module}/...`.
         * *Constraint:* Ensure Namespace matches `App\Modules\{Module}\...`.
 
 3.  **Database:**
-    * Create Migration: `php artisan make:migration create_xxx_table`.
-    * Update Model: Located in `app/Modules/{Module}/Models/`. Set `$guarded = []`.
+    * Create Migration: `cd src && php artisan make:migration create_xxx_table`.
+    * Update Model: Located in `src/app/Modules/{Module}/Models/`. Set `$guarded = []`.
 
 4.  **Test (Red):**
-    * Create a Feature test: `tests/Feature/{Module}/xxxTest.php`.
+    * Create a Feature test: `src/tests/Feature/{Module}/xxxTest.php`.
     * Ensure it fails first.
 
 5.  **Implement (Green):**
@@ -33,7 +43,7 @@
     * Create the API Resource.
 
 6.  **UI (Inertia):**
-    * Create Vue Page: `resources/js/Pages/{Module}/Index.vue`.
+    * Create Vue Page: `src/resources/js/Pages/{Module}/Index.vue`.
     * Ensure props are typed with TypeScript interfaces.
 
 ---
@@ -46,7 +56,7 @@
     * Write a failing test case that reproduces the bug.
 
 2.  **Fix:**
-    * Modify the code in the specific `app/Modules/{Module}`.
+    * Modify the code in the specific `src/app/Modules/{Module}`.
     * Run tests until Green.
 
 3.  **Refactor:**
@@ -58,7 +68,7 @@
 ## SCENARIO 3: Refactoring & Cleanup
 **Trigger:** User asks to "clean up", "optimize", or "review" code.
 
-1.  **Safety Check:** Run `php artisan test` to ensure baseline is passing.
+1.  **Safety Check:** Run `cd src && php artisan test` to ensure baseline is passing.
 2.  **Analyze:**
     * Check `.context/rules/coding_style.md`.
     * Look for fat Controllers (move logic to Services).
@@ -73,6 +83,6 @@
 
 1.  **Migration:** Create a *new* migration. DO NOT edit old migration files.
 2.  **Model Update:**
-    * Update `app/Modules/{Module}/Models/{Model}.php`.
+    * Update `src/app/Modules/{Module}/Models/{Model}.php`.
     * Update `casts` (e.g., `=> 'datetime'`).
     * Update relationships if foreign keys changed.
