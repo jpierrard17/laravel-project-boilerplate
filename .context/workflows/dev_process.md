@@ -9,42 +9,41 @@
 
 1.  **Check:** Does `src/composer.json` exist?
 2.  **Action:** If not, run `./.context/scripts/init.sh`.
-3.  **Wait:** Wait for the script to complete installation (Composer/NPM).
+3.  **Wait:** Wait for the script to complete installation.
 4.  **Verify:** Ensure `src/app/Modules` exists.
 
 ---
 
-## SCENARIO 1: New Feature / Domain Logic
-**Trigger:** User asks to "build", "create", or "add" a new capability (e.g., "Add a Gym Tracker").
+## SCENARIO 1: New Feature / Module
+**Trigger:** User asks to "build", "create", or "add" a new domain/module (e.g., "Add a Blog").
 
-1.  **Analyze Domain:**
-    * Does this belong to an existing Module (e.g., `Hevy`)?
-    * Or is this a *new* Domain?
+1.  **Scaffold:**
+    * Run: `cd src && php artisan module:make {ModuleName}`.
+    * *Note:* This command automatically generates the Model, Controller, Service Provider, and Routes.
 
-2.  **Scaffold:**
-    * **If New Module:**
-        * Run the helper script: `./.context/scripts/make-module.sh {ModuleName}`.
-        * *Note:* Routes are automatically discovered by `bootstrap/app.php`; no manual registration is needed.
-    * **If Existing Module:**
-        * Manually create the Service/Controller in `src/app/Modules/{Module}/...`.
-        * *Constraint:* Ensure Namespace matches `App\Modules\{Module}\...`.
+2.  **Cleanup (Optional):**
+    * The package generates a `composer.json` and `module.json` inside `app/Modules/{Name}/`.
+    * If this is an internal module, these can be ignored.
 
-3.  **Database:**
-    * Create Migration: `cd src && php artisan make:migration create_xxx_table`.
-    * Update Model: Located in `src/app/Modules/{Module}/Models/`. Set `$guarded = []`.
+3.  **Verify Structure:**
+    * Routes: `src/app/Modules/{Name}/Routes/web.php` (Auto-registered).
+    * Config: `src/app/Modules/{Name}/Config/config.php`.
 
-4.  **Test (Red):**
+4.  **Database:**
+    * Create Migration: `cd src && php artisan module:make-migration create_xxx_table {ModuleName}`.
+    * Update Model: Located in `src/app/Modules/{Name}/Models/`. Set `$guarded = []`.
+
+5.  **Test (Red):**
     * Create a Feature test: `src/tests/Feature/{Module}/xxxTest.php`.
-    * Ensure it fails first.
+    * *Tip:* You can use `php artisan module:make-test {Name} {ModuleName}`.
 
-5.  **Implement (Green):**
+6.  **Implement (Green):**
     * Write the Service logic.
-    * Connect the Controller.
-    * Create the API Resource.
+    * Connect the Controller (`Http/Controllers`).
+    * Create the API Resource (`Http/Resources`).
 
-6.  **UI (Inertia):**
+7.  **UI (Inertia):**
     * Create Vue Page: `src/resources/js/Pages/{Module}/Index.vue`.
-    * Ensure props are typed with TypeScript interfaces.
 
 ---
 
@@ -53,36 +52,18 @@
 
 1.  **Replication:**
     * Ask user for reproduction steps.
-    * Write a failing test case that reproduces the bug.
+    * Write a failing test case.
 
 2.  **Fix:**
-    * Modify the code in the specific `src/app/Modules/{Module}`.
+    * Modify code in `src/app/Modules/{Module}`.
     * Run tests until Green.
 
-3.  **Refactor:**
-    * Check for regression.
-    * Ensure no "quick hacks" were left (e.g., `dd()`, commented code).
-
 ---
 
-## SCENARIO 3: Refactoring & Cleanup
-**Trigger:** User asks to "clean up", "optimize", or "review" code.
-
-1.  **Safety Check:** Run `cd src && php artisan test` to ensure baseline is passing.
-2.  **Analyze:**
-    * Check `.context/rules/coding_style.md`.
-    * Look for fat Controllers (move logic to Services).
-    * Look for direct DB queries in Controllers (move to Services).
-3.  **Apply:** Make changes incrementally.
-4.  **Verify:** Run tests after every major change.
-
----
-
-## SCENARIO 4: Database Modification
+## SCENARIO 3: Database Modification
 **Trigger:** User wants to add columns or change schema.
 
-1.  **Migration:** Create a *new* migration. DO NOT edit old migration files.
+1.  **Migration:**
+    * `cd src && php artisan module:make-migration add_xxx_to_yyy_table {ModuleName}`.
 2.  **Model Update:**
     * Update `src/app/Modules/{Module}/Models/{Model}.php`.
-    * Update `casts` (e.g., `=> 'datetime'`).
-    * Update relationships if foreign keys changed.
