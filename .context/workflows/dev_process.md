@@ -38,12 +38,13 @@
     * *Tip:* You can use `php artisan module:make-test {Name} {ModuleName}`.
 
 6.  **Implement (Green):**
-    * Write the Service logic.
+    * Write the Service logic in `src/app/Modules/{Name}/Services`.
     * Connect the Controller (`Http/Controllers`).
     * Create the API Resource (`Http/Resources`).
 
 7.  **UI (Inertia):**
     * Create Vue Page: `src/resources/js/Pages/{Module}/Index.vue`.
+    * Ensure props are typed with TypeScript interfaces.
 
 ---
 
@@ -58,6 +59,10 @@
     * Modify code in `src/app/Modules/{Module}`.
     * Run tests until Green.
 
+3.  **Refactor:**
+    * Check for regression.
+    * Ensure no "quick hacks" were left (e.g., `dd()`, commented code).
+
 ---
 
 ## SCENARIO 3: Database Modification
@@ -67,3 +72,4 @@
     * `cd src && php artisan module:make-migration add_xxx_to_yyy_table {ModuleName}`.
 2.  **Model Update:**
     * Update `src/app/Modules/{Module}/Models/{Model}.php`.
+    * Update `$casts` and relationships.
