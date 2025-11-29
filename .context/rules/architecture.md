@@ -19,7 +19,8 @@ app/Modules/{DomainName}/
 ├── Models/            # Database Models & Relationships
 ├── Services/          # Business Logic & Integrations
 ├── Data/              # DTOs (Data Transfer Objects)
-└── Tests/             # (Optional) Unit/Feature tests specific to this module
+├── routes/            # Module-specific routes (web.php / api.php)
+└── Tests/             # Unit/Feature tests specific to this module
 ```
 
 ## 3. Namespacing & File Placement
