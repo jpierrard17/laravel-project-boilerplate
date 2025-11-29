@@ -34,20 +34,24 @@ echo "FORWARD_MAILPIT_PORT: $FORWARD_MAILPIT_PORT"
 echo "FORWARD_MAILPIT_DASHBOARD_PORT: $FORWARD_MAILPIT_DASHBOARD_PORT"
 
 # Update .env file
-# Ensure these keys exist in your .env or append them
-# Resolve .env path relative to the script location (.context/scripts/setup-ports.sh -> ../src/.env)
+# Resolve .env path relative to the script location
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_FILE="$SCRIPT_DIR/../src/.env"
+
+# FIX 1: Go up two levels (.context/scripts -> .context -> root) to find src
+ENV_FILE="$SCRIPT_DIR/../../src/.env"
 
 if [ -f "$ENV_FILE" ]; then
     # Function to update or append env var
     update_env() {
         local key=$1
         local value=$2
-        if grep -q "^$key=" .env; then
-            sed -i '' "s/^$key=.*/$key=$value/" .env
+        
+        # FIX 2: Use "$ENV_FILE" variable, do not hardcode .env
+        if grep -q "^$key=" "$ENV_FILE"; then
+            # Using BSD sed (macOS) syntax: -i ''
+            sed -i '' "s/^$key=.*/$key=$value/" "$ENV_FILE"
         else
-            echo "$key=$value" >> .env
+            echo "$key=$value" >> "$ENV_FILE"
         fi
     }
 
@@ -58,7 +62,9 @@ if [ -f "$ENV_FILE" ]; then
     update_env "FORWARD_MAILPIT_PORT" "$FORWARD_MAILPIT_PORT"
     update_env "FORWARD_MAILPIT_DASHBOARD_PORT" "$FORWARD_MAILPIT_DASHBOARD_PORT"
 
-    echo "Ports updated in .env"
+    echo "Ports updated in src/.env"
 else
-    echo ".env file not found! Please copy .env.example to .env first."
+    echo "❌ Error: $ENV_FILE not found!" 
+    echo "  1. Run './.context/scripts/init.sh' first."
+    echo "  2. Ensure 'src/.env' exists (copy from .env.example if needed)."
 fi

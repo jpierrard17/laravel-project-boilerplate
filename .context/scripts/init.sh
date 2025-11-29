@@ -6,8 +6,9 @@ set -e
 echo "🚀 Starting Dynamic Boilerplate Initialization..."
 
 # 1. Install Latest Laravel
-if [ -d "src" ]; then
-    echo "⚠️  'src' directory already exists. Skipping Laravel installation."
+# CHANGED: Check for composer.json instead of just the directory
+if [ -f "src/composer.json" ]; then
+    echo "⚠️  Laravel is already installed in 'src'. Skipping download."
 else
     echo "📦 Downloading latest Laravel into 'src'..."
     docker run --rm \

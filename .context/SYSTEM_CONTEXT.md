@@ -16,19 +16,19 @@ Your goal is to build, maintain, and refactor a robust Laravel application using
 You are operating within a strict context structure. Do not guess; refer to these files for specific instructions:
 
 ### A. Rules (The "Law")
-* **Tech Stack:** `.context/rules/tech_stack.md`
+* **Tech Stack:** `rules/tech_stack.md`
     * *Consult for:* Version numbers, approved libraries (Inertia, PrimeVue, Tailwind), and infrastructure details.
-* **Coding Standards:** `.context/rules/coding_style.md`
+* **Coding Standards:** `rules/coding_style.md`
     * *Consult for:* Naming conventions, controller logic, Model definitions, and TypeScript interfaces.
-* **Architecture:** `.context/rules/architecture.md` (if available)
-    * *Consult for:* Design patterns, Service layer logic, and Domain Driven Design boundaries.
+* **Architecture:** `rules/architecture.md`
+    * *Consult for:* Modular Monolith structure, Service layer logic, and Domain boundaries.
 
 ### B. Processes (The "How-To")
-* **Workflows:** `.context/workflows/dev_process.md`
+* **Workflows:** `workflows/dev_process.md`
     * *CRITICAL:* Before starting ANY coding task (Feature, Bug, or Refactor), read this file to determine the correct step-by-step workflow.
 
 ### C. Documentation
-* **Setup:** `.context/docs/setup.md`
+* **Setup:** `docs/setup.md`
     * *Consult for:* Docker/Sail configuration and Port Management (`setup-ports.sh`).
 
 ---
@@ -37,12 +37,12 @@ You are operating within a strict context structure. Do not guess; refer to thes
 
 ### General Workflow
 1.  **Analyze:** Read the user request.
-2.  **Route:** Decide if this is a **Feature**, **Bug**, or **Chore** based on `.context/workflows/dev_process.md`.
-3.  **Check Rules:** Briefly cross-reference `.context/rules/coding_style.md` to ensure style compliance.
+2.  **Route:** Decide if this is a **Feature**, **Bug**, or **Chore** based on `workflows/dev_process.md`.
+3.  **Check Rules:** Briefly cross-reference `rules/coding_style.md` to ensure style compliance.
 4.  **Execute:** Generate the code or run the command.
 
 ### Environment Management
-* **Ports:** This project uses dynamic port assignment. NEVER hardcode ports (80, 8000, 3306) in examples. Always refer to `setup-ports.sh` logic or existing `.env` values.
+* **Ports:** This project uses dynamic port assignment. NEVER hardcode ports (80, 8000, 3306) in examples. Always refer to `scripts/setup-ports.sh` logic or existing `.env` values.
 * **Sail:** Always prefer `sail` commands over local PHP commands (e.g., `sail artisan` vs `php artisan`).
 
 ### Coding Constraints

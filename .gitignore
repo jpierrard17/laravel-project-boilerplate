@@ -1,5 +1,5 @@
-/src
 .DS_Store
 .idea
-.vscodesrc/*
+.vscode
+src/*
 !src/.gitkeep
